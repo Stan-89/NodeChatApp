@@ -13,3 +13,12 @@ socket.on('disconnect', function(){
 socket.on('newMessage', function(message) {
   console.log("Received message from server", message);
 });
+
+
+//Just a test to see how we can use the event acknowledgement from the server
+socket.emit('createMessage', {
+  from: 'Frank',
+  text: 'Hi'
+}, function (data) {
+  console.log('Got it', data);
+});

@@ -45,7 +45,7 @@ socket.broadcast.emit('newMessage',generateMessage('Admin', 'A new user has join
 
 //A new message has been created by THIS (socket) user - user will emit a createMessage event
 //and we take care of it here. Idea is to tell the chat that there is a new msg
-socket.on('createMessage', (message) => {
+socket.on('createMessage', (message, callback) => {
   //We print it here on the server, we have received a msg from this connection
   console.log('createMessage', message);
 
@@ -63,6 +63,13 @@ socket.on('createMessage', (message) => {
   });
 
   */
+
+  //Event acknowledgement: We can send 1 argument back with callback(...);
+  callback({
+    msg:'AllGood',
+    myStatus: 200
+  });
+
   });
 
   //On disconnect
