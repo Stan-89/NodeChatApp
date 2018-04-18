@@ -9,13 +9,13 @@ socket.on('disconnect', function(){
   console.log("Disconnected from server");
 });
 
-//Listen for newEmail that we declared in the server.js
-socket.on('newEmail', function(email) {
-  console.log("Received mail from server", email);
+
+socket.on('newMessage', function(message) {
+  console.log("Received message from server", message);
 });
 
-//Now, send it!
-socket.emit('createEmail', {
-  to: "yo@yo.ca",
-  text: "The text yo"
+
+socket.emit('createMessage', {
+  from: 'Stan',
+  tex: 'Some text yo'
 });

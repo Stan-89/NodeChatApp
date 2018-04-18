@@ -31,28 +31,19 @@ io.on('connection', (socket) => {
     console.log("A user disconnected");
   });
 
-  //Now, we're going to EMIT
-  //socket.emit('newEmail', payload)
-  socket.emit('newEmail', {
-    from: 'Stannis@stan.ca',
-    text: 'Hello how are you',
-    createAt: 123
+  //Emit a message
+  socket.emit('newMessage', {
+    from: 'Stan',
+    text: 'Some text here man',
+    createdAt: 123123
   });
-  //^Ideally, we'd do this in a different file for example.
-  //Ex: chat -> when a POST Msg has been sent and received
-  //After an insertion into MongoDB for example.
 
-  //Now, listen to event fired from the user side
-  socket.on('createEmail', (newEmail) => {
-    console.log("User created an email", newEmail);
+  //On createMessage, print it
+  socket.on('createMessage', (message) => {
+    console.log('createMessage', message);
   });
 
 });
-
-
-
-
-
 
 
 //Recall: app.use(express.static('dirname')) to be able to serve up
