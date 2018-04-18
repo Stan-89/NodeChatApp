@@ -13,9 +13,3 @@ socket.on('disconnect', function(){
 socket.on('newMessage', function(message) {
   console.log("Received message from server", message);
 });
-
-
-socket.emit('createMessage', {
-  from: 'Stan',
-  tex: 'Some text yo'
-});

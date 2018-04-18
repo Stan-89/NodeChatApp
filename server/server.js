@@ -21,27 +21,65 @@ var server = http.createServer(app);
 var io = socketIO(server);
 //io is the web socket server.
 
-//io.on lets us register a listener to an event.
-//Socket is itself the connection established
+//A connection with the user is established
+//when io.On , we listen to EVERYONE. Its argument is socket
+//When socket.on, we listen to that specific connection ONLY.
 io.on('connection', (socket) => {
-  console.log("New user connected");
+//The arg socket represents the connection associated
+//Print in the console about the connection
+console.log("New user connected");
 
-  //On disconnect, just say it
+
+//Emit an event to this user (socket)
+socket.emit('newMessage', {
+  from: 'Admin',
+  text: 'Welcome to the chat application!',
+  createdAt: new Date().getTime()
+});
+
+//Tell everyone except the current user about hte new connection
+//socket.broadcast.emit will send to everyone except the socket [connected user]
+//We'll send the same event type (newMessage) since it's the same thing as the one
+//before - on the front end, we need to write it only once.
+socket.broadcast.emit('newMessage', {
+  from: 'Admin',
+  text: 'A new user has joined',
+  createdAt: new Date().getTime()
+});
+
+//A new message has been created by THIS (socket) user - user will emit a createMessage event
+//and we take care of it here. Idea is to tell the chat that there is a new msg
+socket.on('createMessage', (message) => {
+  //We print it here on the server, we have received a msg from this connection
+  console.log('createMessage', message);
+
+  //Emit to EVERYONE, including the user who posted this message
+  io.emit('newMessage', {
+    from: message.from,
+    text: message.text,
+    createdAt: new Date().getTime()
+  });
+
+  //Note: if we wanted to broadcast (show this msg to everyone except the socket)
+  //Since it is the user on this particular socket that we sent it ...
+  //Recall that we get socket from io.on('connection', (socket) => {...})
+  /*
+  socket.broadcast.emit('newMessage', {
+    from: message.from,
+    text: message.text,
+    createdAt: new Date().getTime()
+  });
+
+  */
+
+  //On disconnect
   socket.on('disconnect', () => {
-    console.log("A user disconnected");
+    console.log('A user disconnected');
   });
+});
 
-  //Emit a message
-  socket.emit('newMessage', {
-    from: 'Stan',
-    text: 'Some text here man',
-    createdAt: 123123
-  });
 
-  //On createMessage, print it
-  socket.on('createMessage', (message) => {
-    console.log('createMessage', message);
-  });
+
 
 });
 
