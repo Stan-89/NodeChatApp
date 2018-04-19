@@ -9,5 +9,14 @@ var generateMessage = (from, text) => {
   }
 };
 
+//Generate a location message with the latitude and longitude given
+var generateLocationMessage = (from, latitude, longitude) => {
+  return{
+    from,
+    url:`https://www.google.com/maps?q=${latitude},${longitude}`,
+    createdAt: new Date().getTime()
+  }
+}
+
 //Export the generateMessage var
-module.exports = {generateMessage};
+module.exports = {generateMessage, generateLocationMessage};

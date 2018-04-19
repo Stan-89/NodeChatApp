@@ -43,3 +43,37 @@ var li = jQuery('<li></li>');
 li.text(`${message.from}: ${message.text}`);
 jQuery('#messages').append(li);
 });
+
+//--------------------------------------------------------- GEOLOCATION PART
+//Click on the location button
+var locationButton = jQuery('#send-location');
+//Upon clicking the button
+locationButton.on('click', function () {
+  //!navigator.geolocation if not supported/allowed
+  if (!navigator.geolocation) {
+    return alert('Geolocation not supported by your browser.');
+  }
+
+  //Navigator.geolocation.currentPosition gets an anonymous function
+  //whos argument is the position (position.coords.latitude or longitude)
+  navigator.geolocation.getCurrentPosition(function (position) {
+    //Emit createLocation msg
+    socket.emit('createLocationMessage', {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    });
+  }, function () {
+    alert('Unable to fetch location.');
+  });
+});
+
+//When we receive a newLocationMessage by the server, show it
+socket.on('newLocationMessage', function (message) {
+  var li = jQuery('<li></li>');
+  var a = jQuery('<a target="_blank">My current location</a>');
+
+  li.text(`${message.from}: `);
+  a.attr('href', message.url);
+  li.append(a);
+  jQuery('#messages').append(li);
+});
