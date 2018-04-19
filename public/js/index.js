@@ -37,10 +37,10 @@ jQuery('#message-form').on('submit', function(e){
 //Now, listening to events from server (newMessage), we print it
 //Recall that we avoid using arrow notation on user side since many have no es6
 socket.on('newMessage', function(message){
-console.log('newMessage', message);
+var formattedTime = moment(message.createdAt).format('h:mm a');
 var li = jQuery('<li></li>');
 //Concatination works even if no es6
-li.text(`${message.from}: ${message.text}`);
+li.text(`${message.from} ${formattedTime}: ${message.text}`);
 jQuery('#messages').append(li);
 });
 
@@ -69,11 +69,14 @@ locationButton.on('click', function () {
 
 //When we receive a newLocationMessage by the server, show it
 socket.on('newLocationMessage', function (message) {
+  //Format the time for printing
+  var formattedTime = moment(message.createdAt).format('h:mm a');
   var li = jQuery('<li></li>');
   var a = jQuery('<a target="_blank">My current location</a>');
-
-  li.text(`${message.from}: `);
+  //Text and url
+  li.text(`${message.from} ${formattedTime}: `);
   a.attr('href', message.url);
+  //Append what we created
   li.append(a);
   jQuery('#messages').append(li);
 });
