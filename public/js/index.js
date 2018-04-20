@@ -30,6 +30,7 @@ jQuery('#message-form').on('submit', function(e){
     from: 'User',
     text: jQuery('[name=message]').val()
   }, function(){
+    //Just clearing before the next message
     jQuery('[name=message]').val("");
   });
 });
@@ -38,10 +39,24 @@ jQuery('#message-form').on('submit', function(e){
 //Recall that we avoid using arrow notation on user side since many have no es6
 socket.on('newMessage', function(message){
 var formattedTime = moment(message.createdAt).format('h:mm a');
-var li = jQuery('<li></li>');
-//Concatination works even if no es6
-li.text(`${message.from} ${formattedTime}: ${message.text}`);
-jQuery('#messages').append(li);
+
+  //We'll be rendering with Mustache. It's already included in index.html
+  //Find the <script> tag that is text/template type with an id, take its html
+  var template = jQuery('#message-template').html();
+
+  //Using Mustache, render that html template by looking at the values in the
+  //2nd argument for replacement
+  var html = Mustache.render(template, {
+    //RHS is what we got in the template, lhs is what we give in current context
+    //RHS:LHS
+    text: message.text,
+    from: message.from,
+    createdAt: formattedTime
+  });
+
+  //Finally, append that html to where it should go (in SCRIPT it wasn't visible)
+  jQuery('#messages').append(html);
+
 });
 
 //--------------------------------------------------------- GEOLOCATION PART
@@ -71,12 +86,13 @@ locationButton.on('click', function () {
 socket.on('newLocationMessage', function (message) {
   //Format the time for printing
   var formattedTime = moment(message.createdAt).format('h:mm a');
-  var li = jQuery('<li></li>');
-  var a = jQuery('<a target="_blank">My current location</a>');
-  //Text and url
-  li.text(`${message.from} ${formattedTime}: `);
-  a.attr('href', message.url);
-  //Append what we created
-  li.append(a);
-  jQuery('#messages').append(li);
+  //We repeat the same thing now, but for location messages
+  var template = jQuery('#location-message-template').html();
+  var html = Mustache.render(template, {
+    from: message.from,
+    url: message.url,
+    createdAt: formattedTime
+  });
+
+  jQuery('#messages').append(html);
 });
