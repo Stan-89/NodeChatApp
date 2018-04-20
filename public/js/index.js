@@ -1,5 +1,36 @@
 var socket = io();
 
+//Declare our scroll to bottom function
+function scrollToBottom ()
+{
+  // Selecting the stuff
+
+  //The whole spot for messages (this is our working screen)
+  var messages = jQuery('#messages');
+  //The added msg
+  var newMessage = messages.children('li:last-child');
+
+  // Heights: note: we can .prop('nameOfProp') in jQuery to get the info
+  //Concerning the particular container
+
+  //ClientHeight: what the user sees currently
+  var clientHeight = messages.prop('clientHeight');
+  //scrollTop: how many pixels since the top of this element
+  var scrollTop = messages.prop('scrollTop');
+  //All of it
+  var scrollHeight = messages.prop('scrollHeight');
+  //New message inner height
+  var newMessageHeight = newMessage.innerHeight();
+  //Last message's
+  var lastMessageHeight = newMessage.prev().innerHeight();
+
+  //What the client sees + pixels from beginning  + newMsgHeight + lastMsgHeight > scrollheight
+  //Then we're not exactly on the bottom, but at least 1px off it (but not more than 1 new msg distance)
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    messages.scrollTop(scrollHeight);
+  }
+}
+
 
 socket.on('connect', function(){
   console.log('Connected to server');
@@ -56,6 +87,7 @@ var formattedTime = moment(message.createdAt).format('h:mm a');
 
   //Finally, append that html to where it should go (in SCRIPT it wasn't visible)
   jQuery('#messages').append(html);
+  scrollToBottom();
 
 });
 
@@ -95,4 +127,5 @@ socket.on('newLocationMessage', function (message) {
   });
 
   jQuery('#messages').append(html);
+  scrollToBottom();
 });
