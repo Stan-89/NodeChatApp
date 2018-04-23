@@ -11,6 +11,9 @@ const socketIO = require('socket.io');
 //Recall object deconstruction ES6: const {onlyWhatWeWantImported} = require(...)
 const {generateMessage, generateLocationMessage} = require('./util/message.js');
 
+//Realstring tool from utils
+const {isRealString} = require('./util/validation.js');
+
 
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -41,7 +44,20 @@ socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat applicat
 //socket.broadcast.emit will send to everyone except the socket [connected user]
 //We'll send the same event type (newMessage) since it's the same thing as the one
 //before - on the front end, we need to write it only once.
-socket.broadcast.emit('newMessage',generateMessage('Admin', 'A new user has joined!'))
+socket.broadcast.emit('newMessage',generateMessage('Admin', 'A new user has joined!'));
+
+//After the connection is made and we have the socket (individual conenction)
+//Listen to 'join' event sent from the connection -> and use callback since we'll return
+//error msg if the name is not right
+socket.on('join', (params, callback) => {
+  if(!isRealString(params.name) || !isRealString(params.room)){
+    callback("Name and room name are required!");
+  }
+  //If no errors, empty callback -> so that if(err) will be false and server will tell OK
+  callback();
+});
+
+
 
 //A new message has been created by THIS (socket) user - user will emit a createMessage event
 //and we take care of it here. Idea is to tell the chat that there is a new msg

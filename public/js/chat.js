@@ -33,6 +33,25 @@ function scrollToBottom ()
 
 
 socket.on('connect', function(){
+  //Here: we write our code for checking the room name and what to send to server
+  var params = jQuery.deparam(window.location.search); //The GEt string
+
+  //Emit join event with the params as payload
+  //Recall that third argument: anon function -> what happens with the info
+  //given back from the server (event ACKNOWLEDGEMENT)
+  socket.emit('join', params, function (err){
+    //If an error was made (returned from server)
+    if(err){
+      alert(err);
+      //After alert, redirect it
+      window.location.href = '/';
+    }
+    else{
+      //We'll take care of this later
+      console.log("No error");
+    }
+  });
+
   console.log('Connected to server');
 });
 
