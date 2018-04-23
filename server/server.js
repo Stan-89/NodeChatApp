@@ -50,7 +50,7 @@ socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat applicat
 //socket.broadcast.emit will send to everyone except the socket [connected user]
 //We'll send the same event type (newMessage) since it's the same thing as the one
 //before - on the front end, we need to write it only once.
-socket.broadcast.emit('newMessage',generateMessage('Admin', 'A new user has joined!'));
+//socket.broadcast.emit('newMessage',generateMessage('Admin', 'A new user has joined!'));
 
 //After the connection is made and we have the socket (individual conenction)
 //Listen to 'join' event sent from the connection -> and use callback since we'll return
