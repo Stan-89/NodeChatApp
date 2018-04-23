@@ -53,6 +53,15 @@ socket.on('join', (params, callback) => {
   if(!isRealString(params.name) || !isRealString(params.room)){
     callback("Name and room name are required!");
   }
+  //If here, we're ok
+  //Emit to this particular user
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+
+  //Broadcast to room (everyone in room except current user) that he/she has joined
+  //In params, we have .room and .name contained (from deparam href)
+  socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`));
+
+
   //If no errors, empty callback -> so that if(err) will be false and server will tell OK
   callback();
 });
