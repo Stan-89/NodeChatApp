@@ -90,11 +90,16 @@ socket.on('join', (params, callback) => {
 //A new message has been created by THIS (socket) user - user will emit a createMessage event
 //and we take care of it here. Idea is to tell the chat that there is a new msg
 socket.on('createMessage', (message, callback) => {
-    //We print it here on the server, we have received a msg from this connection
-    console.log('createMessage', message);
+    //Get the user based on socket
+    var user = users.getUser(socket.id);
 
-    //Emit to EVERYONE, including the user who posted this message
-    io.emit('newMessage', generateMessage(message.from, message.text));
+    //We only want to do if it exsits
+    if(user && isRealString(message.text)){
+      //Emit to EVERYONE, including the user who posted this message
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
+
 
     //Note: if we wanted to broadcast (show this msg to everyone except the socket)
     //Since it is the user on this particular socket that we sent it ...
@@ -121,8 +126,15 @@ socket.on('createMessage', (message, callback) => {
   //the payload is just the coords. Also: no callback for validation needed.
   //(Second argument would have to be callback if we want to send back info)
   socket.on('createLocationMessage', (coords) => {
-    //Emit to everyone
-    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
+    //Get the user
+    var user = users.getUser(socket.id);
+
+    if(user){
+      //Emit to everyone
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+    }
+
+
   });
 
   //On disconnect

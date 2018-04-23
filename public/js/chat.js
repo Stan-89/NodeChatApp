@@ -87,7 +87,6 @@ jQuery('#message-form').on('submit', function(e){
   //Also since JS, we have access to jQuery at the same time as socket.js
   //that is given from server
   socket.emit('createMessage', {
-    from: 'User',
     text: jQuery('[name=message]').val()
   }, function(){
     //Just clearing before the next message
