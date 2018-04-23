@@ -14,6 +14,9 @@ const {generateMessage, generateLocationMessage} = require('./util/message.js');
 //Realstring tool from utils
 const {isRealString} = require('./util/validation.js');
 
+//User class
+const {Users} = require('./util/users.js');
+
 
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -27,6 +30,9 @@ var server = http.createServer(app);
 //We tell socketIO what server we want to use it in.
 var io = socketIO(server);
 //io is the web socket server.
+
+//We keep track of our users with Users
+var users = new Users();
 
 //A connection with the user is established
 //when io.On , we listen to EVERYONE. Its argument is socket
@@ -53,6 +59,19 @@ socket.on('join', (params, callback) => {
   if(!isRealString(params.name) || !isRealString(params.room)){
     callback("Name and room name are required!");
   }
+
+  //Join the room in question
+  socket.join(params.room);
+
+  //Remove the user, just in case
+  users.removeUser(socket.id);
+
+  //Add him
+  users.addUser(socket.id, params.name, params.room);
+
+  //Emit to whole room
+  io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+
   //If here, we're ok
   //Emit to this particular user
   socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
@@ -108,7 +127,14 @@ socket.on('createMessage', (message, callback) => {
 
   //On disconnect
   socket.on('disconnect', () => {
-    console.log('User was disconnected');
+    //Get the disconnected user
+    var user = users.removeUser(socket.id);
+
+    //If there was such a user, update the list and send msg
+    if (user) {
+      io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+    }
   });
 
 });
